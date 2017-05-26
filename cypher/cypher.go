@@ -11,27 +11,29 @@ import (
 	math_rand "math/rand"
 
 	"github.com/alknopfler/Gologger/gologger"
-	"errors"
 )
 
-var Keycypher []byte
+type KeyCypher struct {
+	key 	[]byte
+}
 
-func InitKeyCypher(cypherType int) error {
+func InitKeyCypher(cypherType int) *KeyCypher {
+	var k = KeyCypher{}
 	const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,:;.<>"
-	if cypherType != 16 || cypherType != 24 || cypherType != 32{
-		return errors.New("CypherType not OK")
+	if cypherType != 16 && cypherType != 24 && cypherType != 32{
+		return &k
 	}
 	b := make([]byte, cypherType)
 	for i := range b {
 		b[i] = letterBytes[math_rand.Intn(len(letterBytes))]
 	}
-	Keycypher = b
-	return nil
+	k.key = b
+	return &k
 }
 
-func EncryptString(text string) string {
+func (k *KeyCypher) EncryptString(text string) string {
 	plaintext := []byte(text)
-	block, err := aes.NewCipher(Keycypher)
+	block, err := aes.NewCipher(k.key)
 	if err != nil {
 		gologger.Print("ERROR", 8, "Error while cyphering key", "cypher.go")
 	}
@@ -46,9 +48,9 @@ func EncryptString(text string) string {
 	return base64.URLEncoding.EncodeToString(ciphertext)
 }
 
-func DecryptString(cryptoText string) string {
+func (k *KeyCypher) DecryptString(cryptoText string) string {
 	ciphertext, _ := base64.URLEncoding.DecodeString(cryptoText)
-	block, err := aes.NewCipher(Keycypher)
+	block, err := aes.NewCipher(k.key)
 	if err != nil {
 		gologger.Print("ERROR", 8, "Error while cyphering", "cipher.go")
 	}
