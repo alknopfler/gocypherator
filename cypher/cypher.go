@@ -14,7 +14,7 @@ import (
 )
 
 type KeyCypher struct {
-	key 	[]byte
+	Key 	[]byte
 }
 
 func InitKeyCypher(cypherType int) *KeyCypher {
@@ -27,13 +27,13 @@ func InitKeyCypher(cypherType int) *KeyCypher {
 	for i := range b {
 		b[i] = letterBytes[math_rand.Intn(len(letterBytes))]
 	}
-	k.key = b
+	k.Key = b
 	return &k
 }
 
 func (k *KeyCypher) EncryptString(text string) string {
 	plaintext := []byte(text)
-	block, err := aes.NewCipher(k.key)
+	block, err := aes.NewCipher(k.Key)
 	if err != nil {
 		gologger.Print("ERROR", 8, "Error while cyphering key", "cypher.go")
 	}
@@ -50,7 +50,7 @@ func (k *KeyCypher) EncryptString(text string) string {
 
 func (k *KeyCypher) DecryptString(cryptoText string) string {
 	ciphertext, _ := base64.URLEncoding.DecodeString(cryptoText)
-	block, err := aes.NewCipher(k.key)
+	block, err := aes.NewCipher(k.Key)
 	if err != nil {
 		gologger.Print("ERROR", 8, "Error while cyphering", "cipher.go")
 	}
